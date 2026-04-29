@@ -341,7 +341,154 @@
     }
     .empty svg { width: 48px; height: 48px; opacity: .3; margin-bottom: 16px; }
     .empty p { font-size: 15px; }
-  </style>
+  
+    /* ── Weather ── */
+    .weather-section { margin-top: 8px; }
+    .weather-section.hidden { display: none; }
+
+    /* Current conditions card */
+    .wx-now {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .wx-now-left { display: flex; align-items: center; gap: 14px; }
+
+    .wx-compass {
+      width: 52px; height: 52px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .wx-compass-arrow { font-size: 26px; display: inline-block; }
+
+    .wx-speed { font-size: 38px; font-weight: 800; letter-spacing: -2px; line-height: 1; }
+    .wx-speed-unit { font-size: 15px; font-weight: 600; color: var(--muted); }
+    .wx-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .wx-gust-inline { color: var(--amber); font-weight: 700; }
+
+    .wx-now-right { text-align: right; }
+    .wx-cond-icon { font-size: 28px; display: block; margin-bottom: 4px; }
+    .wx-cond-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .wx-temp { font-size: 18px; font-weight: 700; }
+
+    /* Peak banner */
+    .wx-peak {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245,158,11,.1);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .wx-peak span { font-size: 13px; font-weight: 600; }
+    .wx-peak strong { color: var(--amber); }
+
+    /* Forecast cards */
+    .wx-forecast {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .wx-forecast::-webkit-scrollbar { display: none; }
+
+    .wx-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 10px;
+      flex: 0 0 88px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .wx-card.wx-now-card {
+      border-color: var(--blue);
+      background: rgba(59,130,246,.12);
+    }
+
+    .wx-card-time {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .3px;
+    }
+    .wx-now-card .wx-card-time { color: var(--blue); }
+
+    .wx-card-icon { font-size: 28px; line-height: 1; }
+
+    .wx-card-wind {
+      text-align: center;
+      line-height: 1.2;
+    }
+    .wx-card-spd { font-size: 20px; font-weight: 800; }
+    .wx-card-unit { font-size: 10px; font-weight: 600; color: var(--muted); }
+    .wx-card-dir { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .wx-card-gust { font-size: 11px; color: var(--amber); font-weight: 700; }
+    .wx-card-temp { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+    .wx-loading { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
+
+    .wind-calm   { color: var(--green); }   /* < 20 kt          */
+    .wind-mod    { color: var(--green); }   /* unused — kept for safety */
+    .wind-fresh  { color: var(--amber); }   /* 20–35 kt or high gust variability */
+    .wind-strong { color: var(--red); }     /* > 35 kt          */
+
+    .wx-updated { font-size: 10px; color: var(--muted); text-align: right; margin-bottom: 8px; }
+
+    /* ── Daily summary ── */
+    .summary-section { margin-top: 20px; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .summary-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .summary-value {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .summary-unit {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+</style>
 </head>
 <body>
 
@@ -441,6 +588,29 @@
     Submit Log
   </button>
 
+  <!-- Weather -->
+  <div class="weather-section" id="weatherSection">
+    <div class="section-label">Weather · KRJB</div>
+    <div id="wxContent"><div class="wx-loading">Loading weather…</div></div>
+  </div>
+
+  <!-- Daily summary -->
+  <div class="summary-section" id="summarySection">
+    <div class="section-label">Today at KRJB</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Landings</div>
+        <div class="summary-value" id="summaryLandings">—</div>
+        <div class="summary-unit">movements</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Fuel Loaded</div>
+        <div class="summary-value" id="summaryFuel">—</div>
+        <div class="summary-unit">US gallons</div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <div class="toast" id="toast">✓ Log submitted successfully</div>
@@ -507,12 +677,15 @@
     const form    = document.getElementById('formCard');
     const btn     = document.getElementById('submitBtn');
 
+    const wxSection = document.getElementById('weatherSection');
     if (!selectedMovement) {
       card.classList.remove('visible');
       form.classList.remove('visible');
       btn.classList.remove('visible');
+      wxSection.classList.remove('hidden');
       return;
     }
+    wxSection.classList.add('hidden');
 
     document.getElementById('acReg').textContent      = selectedMovement.registration;
     document.getElementById('acOperator').textContent = selectedMovement.operator;
@@ -575,7 +748,157 @@
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
+
+  // ── Weather ────────────────────────────────────────────────────────────────
+  const WX_LAT = 40.7007;   // update to exact heliport coordinates
+  const WX_LON = -74.0128;
+
+  const WMO_ICONS = {
+    0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+    45:'🌫️', 48:'🌫️',
+    51:'🌦️', 53:'🌧️', 55:'🌧️',
+    61:'🌦️', 63:'🌧️', 65:'🌧️',
+    71:'🌨️', 73:'❄️', 75:'❄️',
+    80:'🌦️', 81:'🌧️', 82:'⛈️',
+    95:'⛈️', 96:'⛈️', 99:'⛈️'
+  };
+
+  const WMO_LABELS = {
+    0:'Clear', 1:'Mostly clear', 2:'Partly cloudy', 3:'Overcast',
+    45:'Fog', 48:'Freezing fog',
+    51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+    61:'Light rain', 63:'Rain', 65:'Heavy rain',
+    71:'Light snow', 73:'Snow', 75:'Heavy snow',
+    80:'Showers', 81:'Heavy showers', 82:'Violent showers',
+    95:'Thunderstorm', 96:'Thunderstorm', 99:'Severe storm'
+  };
+
+  function degToCompass(d) {
+    return ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
+  }
+  function windClass(spd, gust = 0) {
+    // Gust variability rule: force amber if gusts exceed steady wind by 15+ kt
+    if (gust - spd >= 15) return 'wind-fresh';
+    if (spd > 35)  return 'wind-strong';
+    if (spd >= 20) return 'wind-fresh';
+    return 'wind-calm';
+  }
+  function arrowRotate(deg) {
+    return `display:inline-block;transform:rotate(${(deg+180)%360}deg)`;
+  }
+  function fmtH(h) { return `${h%12||12}${h<12?'am':'pm'}`; }
+
+  async function loadWeather() {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX_LAT}&longitude=${WX_LON}` +
+        `&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,windgusts_10m` +
+        `&windspeed_unit=kn&temperature_unit=fahrenheit&timezone=auto&forecast_days=1`;
+      const data = await (await fetch(url)).json();
+      renderWeather(data);
+    } catch(e) {
+      document.getElementById('wxContent').innerHTML = '<div class="wx-loading">Weather unavailable</div>';
+    }
+  }
+
+  function renderWeather(data) {
+    const now    = new Date();
+    const nowH   = now.getHours();
+    const times  = data.hourly.time;
+    const speeds = data.hourly.windspeed_10m;
+    const dirs   = data.hourly.winddirection_10m;
+    const gusts  = data.hourly.windgusts_10m;
+    const codes  = data.hourly.weathercode;
+    const temps  = data.hourly.temperature_2m;
+
+    const ci   = Math.max(0, times.findIndex(t => parseInt(t.split('T')[1]) === nowH));
+    const spd  = Math.round(speeds[ci]);
+    const gust = Math.round(gusts[ci]);
+    const dir  = dirs[ci];
+    const icon = WMO_ICONS[codes[ci]] ?? '🌡️';
+    const cond = WMO_LABELS[codes[ci]] ?? '';
+    const temp = Math.round(temps[ci]);
+
+    // Peak gust from now until end of day
+    let peakGust = 0, peakHour = nowH, peakDir = dir;
+    for (let i = ci; i < times.length; i++) {
+      const g = Math.round(gusts[i]);
+      if (g > peakGust) { peakGust = g; peakHour = parseInt(times[i].split('T')[1]); peakDir = dirs[i]; }
+    }
+
+    // 6 slots × 2hr
+    let cards = '';
+    for (let s = 0; s < 6; s++) {
+      const idx = ci + s * 2;
+      if (idx >= times.length) break;
+      const h    = parseInt(times[idx].split('T')[1]);
+      const sp   = Math.round(speeds[idx]);
+      const g    = Math.round(gusts[idx]);
+      const d    = dirs[idx];
+      const ic   = WMO_ICONS[codes[idx]] ?? '🌡️';
+      const tp   = Math.round(temps[idx]);
+      const isNow = s === 0;
+      cards += `
+        <div class="wx-card ${isNow ? 'wx-now-card' : ''}">
+          <div class="wx-card-time">${isNow ? 'Now' : fmtH(h)}</div>
+          <div class="wx-card-icon">${ic}</div>
+          <div class="wx-card-wind">
+            <div class="wx-card-spd ${windClass(sp, g)}">${sp}<span class="wx-card-unit"> kt</span></div>
+            <div class="wx-card-dir"><span style="${arrowRotate(d)}">↑</span> ${degToCompass(d)}</div>
+            ${g > sp + 3 ? `<div class="wx-card-gust">G ${g} kt</div>` : '<div class="wx-card-gust" style="visibility:hidden">-</div>'}
+            <div class="wx-card-temp">${tp}°F</div>
+          </div>
+        </div>`;
+    }
+
+    const updated = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+    document.getElementById('wxContent').innerHTML = `
+      <div class="wx-updated">Updated ${updated}</div>
+
+      <div class="wx-now">
+        <div class="wx-now-left">
+          <div class="wx-compass">
+            <span class="wx-compass-arrow" style="${arrowRotate(dir)}">↑</span>
+          </div>
+          <div>
+            <div><span class="wx-speed ${windClass(spd, gust)}">${spd}</span> <span class="wx-speed-unit">kt</span></div>
+            <div class="wx-sub">${degToCompass(dir)} · ${dir}°${gust > spd+3 ? ` · <span class="wx-gust-inline">G ${gust} kt</span>` : ''}</div>
+          </div>
+        </div>
+        <div class="wx-now-right">
+          <span class="wx-cond-icon">${icon}</span>
+          <div class="wx-temp">${temp}°F</div>
+          <div class="wx-cond-label">${cond}</div>
+        </div>
+      </div>
+
+      <div class="wx-peak">
+        <span>⚠️</span>
+        <span>Peak today: <strong>G ${peakGust} kt</strong> from ${degToCompass(peakDir)} around <strong>${fmtH(peakHour)}</strong></span>
+      </div>
+
+      <div class="wx-forecast">${cards}</div>
+    `;
+  }
+
+
+
+  // ── Daily summary ──────────────────────────────────────────────────────────
+  async function loadDailySummary() {
+    // TODO: replace with real API call, e.g.:
+    // const res  = await fetch('/api/summary?date=today&airport=KRJB');
+    // const data = await res.json();
+    // const { landings, fuelGallons } = data;
+    const landings    = 14;   // mock
+    const fuelGallons = 312;  // mock
+
+    document.getElementById('summaryLandings').textContent = landings;
+    document.getElementById('summaryFuel').textContent     = fuelGallons.toLocaleString();
+  }
+
   loadMovements();
+  loadWeather();
+  loadDailySummary();
 </script>
 
 </body>
